@@ -6,7 +6,6 @@ export default function App() {
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
 
-  // ✅ Ambil history dari localStorage saat pertama render
   const [history, setHistory] = useState(() => {
     const stored = localStorage.getItem("weatherHistory");
     return stored ? JSON.parse(stored) : [];
@@ -46,7 +45,6 @@ export default function App() {
     }
   };
 
-  // ✅ Tambahin parameter save
   const fetchWeather = async (city, save = true) => {
     try {
       setError("");
@@ -63,7 +61,6 @@ export default function App() {
     }
   };
 
-  // ✅ Fetch Jakarta tanpa simpan ke history
   useEffect(() => {
     fetchWeather("Jakarta", false);
   }, []);
