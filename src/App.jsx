@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "./api/axios";
 
 export default function App() {
-  const [data, setData] = useState({});
+  const [data, setData] = useState(() => {
+    const storedWeather = localStorage.getItem("lastWeather");
+    return storedWeather ? JSON.parse(storedWeather) : {};
+  });
+
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
 
@@ -49,9 +53,10 @@ export default function App() {
     try {
       setError("");
       const response = await axios.get(
-        `/weather?q=${city}&units=metric&appid=${API_KEY}`
+        `/weather?q=${city}&units=metric&appid=${API_KEY}`,
       );
       setData(response.data);
+      localStorage.setItem("lastWeather", JSON.stringify(response.data));
 
       if (save) {
         saveToHistory(city);
@@ -62,7 +67,9 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (!data.name) {
     fetchWeather("Jakarta", false);
+  }
   }, []);
 
   const searchLocation = (event) => {
@@ -81,9 +88,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-black text-white flex flex-col items-center px-4 py-10">
-      <h1 className="text-4xl font-bold mb-8 text-blue-400">
-        Weather App 🌤
-      </h1>
+      <h1 className="text-4xl font-bold mb-8 text-blue-400">Weather App 🌤</h1>
 
       <input
         value={location}
@@ -126,14 +131,10 @@ export default function App() {
         )}
 
         <div className="w-60 bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl rounded-3xl p-6">
-          <h3 className="text-lg font-semibold mb-4 text-blue-300">
-            History
-          </h3>
+          <h3 className="text-lg font-semibold mb-4 text-blue-300">History</h3>
 
           {history.length === 0 && (
-            <p className="text-gray-400 text-sm">
-              Belum ada pencarian
-            </p>
+            <p className="text-gray-400 text-sm">Belum ada pencarian</p>
           )}
 
           <ul className="space-y-2">
